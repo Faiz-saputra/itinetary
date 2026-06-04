@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "962734297815",
+    "project_id": "itinetary-app",
+    "storage_bucket": "itinetary-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962734297815:android:d85ef38f102cc2af761692",
+        "android_client_info": {
+          "package_name": "com.example.itinetary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFqgrTnyEZJbALUsIDs9lnk7BfywsNWzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
