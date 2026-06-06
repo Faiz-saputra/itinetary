@@ -40,6 +40,27 @@ class TripService {
     await docRef.set(trip.toMap());
   }
 
+  Future<void> updateTrip({
+    required String tripId,
+    required String destination,
+    required DateTime startDate,
+    required DateTime endDate,
+    required double budget,
+    required String notes,
+  }) async {
+    await _firestore.collection('trips').doc(tripId).update({
+      'destination': destination,
+      'startDate': startDate,
+      'endDate': endDate,
+      'budget': budget,
+      'notes': notes,
+    });
+  }
+
+  Future<void> deleteTrip(String tripId) async {
+    await _firestore.collection('trips').doc(tripId).delete();
+  }
+
   Stream<List<TripModel>> getTripsStream(String currentUserUid) {
     debugPrint('TripService.getTripsStream currentUserUid: $currentUserUid');
 

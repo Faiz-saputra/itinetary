@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/trip_model.dart';
 import '../../services/trip_service.dart';
+import 'trip_detail_view.dart';
 
 class TripsView extends StatelessWidget {
   const TripsView({super.key});
@@ -106,67 +107,72 @@ class _TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      color: colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    trip.destination,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TripDetailView(trip: trip)),
+        );
+      },
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        color: colorScheme.surface,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      trip.destination,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Chip(
-                  label: Text(
-                    _formatCurrency(trip.budget),
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w600,
+                  const SizedBox(width: 16),
+                  Chip(
+                    label: Text(
+                      _formatCurrency(trip.budget),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    backgroundColor: colorScheme.primary,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: _DateInfo(
+                      label: 'Start',
+                      date: trip.startDate,
+                      colorScheme: colorScheme,
+                      textTheme: textTheme,
                     ),
                   ),
-                  backgroundColor: colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _DateInfo(
+                      label: 'End',
+                      date: trip.endDate,
+                      colorScheme: colorScheme,
+                      textTheme: textTheme,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: _DateInfo(
-                    label: 'Start',
-                    date: trip.startDate,
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _DateInfo(
-                    label: 'End',
-                    date: trip.endDate,
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
