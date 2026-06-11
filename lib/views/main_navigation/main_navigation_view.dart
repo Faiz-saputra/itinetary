@@ -49,7 +49,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 20),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),

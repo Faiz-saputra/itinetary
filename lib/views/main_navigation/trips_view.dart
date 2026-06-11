@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/utils/currency_helper.dart';
 import '../../models/trip_model.dart';
 import '../../services/trip_service.dart';
 import 'trip_detail_view.dart';
@@ -10,6 +11,7 @@ class TripsView extends StatelessWidget {
 
   Stream<List<TripModel>> _tripStream() {
     final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
     return TripService().getTripsStream(currentUserUid);
   }
 
@@ -24,20 +26,107 @@ class TripsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Trips',
-            style: textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.flight_takeoff,
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Trip Saya',
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            'Kelola itinerary perjalanan Anda',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.airplane_ticket,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+
+                      SizedBox(width: 8),
+
+                      Text(
+                        'Semua perjalanan tersimpan dengan rapi',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Semua perjalanan Anda tersimpan dengan rapi dan bisa diakses cepat.',
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface.withAlpha(191),
-            ),
-          ),
-          const SizedBox(height: 32),
+
+          const SizedBox(height: 24),
+
           Expanded(
             child: StreamBuilder<List<TripModel>>(
               stream: _tripStream(),
@@ -47,13 +136,10 @@ class TripsView extends StatelessWidget {
                 }
 
                 if (snapshot.hasError) {
-                  debugPrint(
-                    'TripsView StreamBuilder error: ${snapshot.error}',
-                  );
                   return Center(
                     child: _StatusCard(
                       icon: Icons.error_outline,
-                      title: 'Something went wrong',
+                      title: 'Terjadi Kesalahan',
                       subtitle: snapshot.error.toString(),
                       color: colorScheme.error,
                     ),
@@ -66,8 +152,8 @@ class TripsView extends StatelessWidget {
                   return Center(
                     child: _StatusCard(
                       icon: Icons.airplane_ticket,
-                      title: 'No trips yet.',
-                      subtitle: 'Create your first itinerary.',
+                      title: 'Belum Ada Trip',
+                      subtitle: 'Buat itinerary pertama Anda.',
                       color: colorScheme.primary,
                     ),
                   );
@@ -107,6 +193,8 @@ class _TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final duration = trip.endDate.difference(trip.startDate).inDays + 1;
+
     return InkWell(
       borderRadius: BorderRadius.circular(24),
       onTap: () {
@@ -116,59 +204,85 @@ class _TripCard extends StatelessWidget {
         );
       },
       child: Card(
-        elevation: 2,
+        elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        color: colorScheme.surface,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Icon(Icons.location_on, color: Colors.red),
+
+                  const SizedBox(width: 6),
+
                   Expanded(
                     child: Text(
                       trip.destination,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Chip(
-                    label: Text(
-                      _formatCurrency(trip.budget),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    backgroundColor: colorScheme.primary,
                   ),
                 ],
               ),
+
+              const SizedBox(height: 14),
+
+              Text(
+                '${_formatDate(trip.startDate)} - ${_formatDate(trip.endDate)}',
+                style: textTheme.bodyMedium,
+              ),
+
               const SizedBox(height: 18),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet,
+                      color: colorScheme.primary,
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Budget', style: textTheme.bodySmall),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            CurrencyHelper.formatRupiah(trip.budget),
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
               Row(
                 children: [
-                  Expanded(
-                    child: _DateInfo(
-                      label: 'Start',
-                      date: trip.startDate,
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _DateInfo(
-                      label: 'End',
-                      date: trip.endDate,
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
-                    ),
-                  ),
+                  const Icon(Icons.calendar_month, size: 18),
+
+                  const SizedBox(width: 6),
+
+                  Text('$duration Hari', style: textTheme.bodyMedium),
                 ],
               ),
             ],
@@ -178,67 +292,23 @@ class _TripCard extends StatelessWidget {
     );
   }
 
-  String _formatCurrency(double value) {
-    final budget = value.toStringAsFixed(
-      value.truncateToDouble() == value ? 0 : 2,
-    );
-    return 'Rp $budget';
-  }
-}
-
-class _DateInfo extends StatelessWidget {
-  const _DateInfo({
-    required this.label,
-    required this.date,
-    required this.colorScheme,
-    required this.textTheme,
-  });
-
-  final String label;
-  final DateTime date;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 189),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          _formatDate(date),
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
   String _formatDate(DateTime date) {
-    final months = [
+    const months = [
       'Jan',
       'Feb',
       'Mar',
       'Apr',
-      'May',
+      'Mei',
       'Jun',
       'Jul',
-      'Aug',
+      'Agu',
       'Sep',
-      'Oct',
+      'Okt',
       'Nov',
-      'Dec',
+      'Des',
     ];
-    return '${months[date.month - 1]} ${date.day.toString().padLeft(2, '0')}, ${date.year}';
+
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
 
@@ -259,7 +329,7 @@ class _StatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: color.withValues(alpha: 20),
+      color: color.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
@@ -267,22 +337,24 @@ class _StatusCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 48, color: color),
+
             const SizedBox(height: 16),
+
             Text(
               title,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
+
             const SizedBox(height: 8),
+
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: color.withValues(alpha: 230),
-              ),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
         ),
